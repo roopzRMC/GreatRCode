@@ -1,0 +1,103 @@
+---
+title: "Writing Great R Code"
+output:
+  html_document:
+    df_print: paged
+---
+
+Great R Code - originally referenced here; https://www.safaribooksonline.com/learning-paths/learning-path-introduction/9781491987209/9781491920886-video209185
+
+check out https://www.amazon.co.uk/Code-Complete-Practical-Handbook-Construction/dp/0735619670/ref=sr_1_1?ie=UTF8&qid=1507627980&sr=8-1&keywords=code+complete+2
+
+remember to code for readability!!! Code for robustness
+
+Writing Stylish Code
+
+Use a style guide
+decide which naming convention you us
+  eg lowercamelcase , UpperCamelCase, lower_under_case AND STICK TO IT!!
+  
+  go here https://4dpiecharts.com/r-code-style-guide/
+
+```{r loadpackages, echo = TRUE, message = FALSE}
+library(sig)
+library(assertive)
+library(testthat)
+library(roxygen2)
+library(lattice)
+```
+
+## Spacing
+
+Writing the following looks cramped
+
+```{r formula1, echo = TRUE, message = FALSE, eval = FALSE}
+y<-sin(2*pi+x)^2
+
+# this looks cramped compared to
+
+y <- sin (2 * pi + x) ^ 2
+```
+
+Generally - it is best practice to translate wide code to long code - eg one argument per line and = signs aligned
+
+```{r bwplottest, eval = FALSE}
+bwplot(
+  decrease ~ treatment,
+  OrchardSprays,
+  groups              = rowpos,
+  panel               = "panel.superimpose"
+)
+
+```
+
+## Writing Robust Code
+When writing a function you can add a condition that stops the function form outputting gibberish if the wrong data is supplied eg
+
+```{r conffunction, eval = FALSE}
+triangular <- function(n)
+{
+  stopifnot(all(n > 0))
+  0.5 * n * (n+1)
+}
+triangular(c(10, -1))
+## ERROR: all(N>0) IS NOT TRUE - this is the actual error message you would get
+
+```
+Better however is to use the assertive library
+
+```{r conffunctioncont, eval = FALSE}
+triangular <- function(n)
+{
+    assert_all_are_positive(n)
+    0.5 * n * (n+1)
+}
+triangular(c(10, -1))
+```
+
+Assertive has a number of data quality checks too eg email addresses! Not fool proof though
+
+## Testing
+
+There are 2 methods of testing = runit and testthat - testthat is more robust
+Here is a basic function
+
+```{r testing_basefunc}
+hypotenuse <- function(x,y)
+{
+  sqrt ( x^ 2 + y ^ 2)
+}
+
+hypotenuse(3,4)
+```
+
+```{r testing_the_base_func}
+test_that("hypotenuse function works with simple inputs", # add comments here to state what the test is supposed to achieve
+          {
+            actual <- hypotenuse(3,4)
+            expected <- 5
+            expect_equal(actual, expected)
+          }
+        ) 
+```
+
